@@ -1,26 +1,25 @@
-const backEndAPI="http://localhost:5678/api/";
+const backEndApiURL="http://localhost:5678/api/";
 
 async function fetchWorks() {
     
     try {
         //Appel de l'API pour obtenir les travaux
-        await fetch(backEndAPI + "works")
+      const works =  await fetch(backEndApiURL + "works")
         .then((response) => response.json())
-        .then((data) => (works = data));
+     
         
         //console.log(works);
-        displayWorks();
+        displayWorks(works);
     } catch (error) {
         //On affiche une erreur dans la console
         console.log(`Une erreur s'est produite:  ${error}`);
     }
 }
 
-function displayWorks() {
+function displayWorks(works) {
     //On récupère le bloc "gallery"
     const gallery = document.querySelector(".gallery");
     //On vide le bloc défini par la classe gallery
-    gallery.innerHTML = "";
     
     //On ajoute les travaux un par un
     works.forEach((work) => {
