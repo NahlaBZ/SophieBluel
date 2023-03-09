@@ -31,7 +31,7 @@ function getFilterNames(works) {
     return [...new Set(works.map((work) => work.category.name))];
 }
 
-function  displayFilterButtons(filterNames, works) {
+function displayFilterButtons(filterNames, works) {
     // On crée d'abord le bouton "Tous" qui ne correspond pas à une vraie catégorie
     const allButton = document.createElement("button");
     //On lui attribue une classe css, ce bouton est celui qui est actif au démarrage de la page
