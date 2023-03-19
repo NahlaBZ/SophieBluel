@@ -10,35 +10,55 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
     <meta name="description" content="">
     <link rel="stylesheet" href="./assets/style.css">
+    <script defer src="./login.js"></script>
+
 </head>
 
-<body>
+<body class="login">
+
     <header>
-        <h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
+        <a href="./index.html">
+            <h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
+        </a>
         <nav>
             <ul>
-                <li>projets</li>
-                <li>contact</li>
-                <li>login</li>
-                <li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
+                <li><a href="./index.html#portfolio">projets</a></li>
+                <li><a href="./index.html#contact">contact</a></li>
+                <li class="selectedMenu">login</li>
+                <li>
+                    <div src="./assets/icons/instagram.png" class="instagram" alt="Instagram"></div>
+                </li>
             </ul>
         </nav>
     </header>
+
     <main>
-        <section id="login">
+
+        <section id="contact">
             <h2>Log In</h2>
-            <form>
+
+            <form id="loginForm">
+
                 <label for="email">E-mail</label>
-                <input type="email" name="email" id="email" required>
-                <label for="password">Mot de passe</label>
-                <input type="password" name="password" id="password" required>
+                <input type="email" name="email" id="email" placeholder="E-mail" autocomplete="off"
+                    value="sophie.bluel@test.tld" required>
+
+                <label for="password">Mot de Passe</label>
+                <input type="password" id="password" placeholder="Mot de passe" name="password" min="4" max="15"
+                    value="S0phie" required>
+                <p class="loginError"></p>
+
                 <input type="submit" value="Se connecter">
             </form>
-            <a href="#">Mot de passe oublié</a>
+            <p class="forgotPassword"><a href="#">Mot de passe oublié</a></p>
         </section>
+
     </main>
+
     <footer>
         <nav>
             <ul>
@@ -46,6 +66,5 @@
             </ul>
         </nav>
     </footer>
-</body>
 
-</html>
+</body>

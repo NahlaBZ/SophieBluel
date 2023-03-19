@@ -111,6 +111,11 @@ ul {
   list-style: none;
 }
 
+blockquote,
+q {
+  quotes: none;
+}
+
 a {
   text-decoration: none;
   color: black;
@@ -118,11 +123,6 @@ a {
 
 a:visited {
   color: inherit;
-}
-
-blockquote,
-q {
-  quotes: none;
 }
 
 blockquote:before,
@@ -263,7 +263,6 @@ li:hover {
   color: #1d6154;
   background: none;
   transition: 0.3s ease;
-
 }
 
 .btn:hover {
@@ -292,30 +291,40 @@ li:hover {
   margin-bottom: 20px;
 }
 
-#contact form,
-#login form {
+#contact form {
   text-align: left;
   margin-top: 30px;
   display: flex;
   flex-direction: column;
 }
 
-#contact input,
-#login input {
+#contact input {
   height: 50px;
   font-size: 1.2em;
   border: none;
   box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 
-#contact label,
-#login label {
+#contact label {
   margin: 2em 0 1em 0;
 }
 
 #contact textarea {
   border: none;
   box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+}
+
+
+input[type="submit"] {
+  font-family: "Syne";
+  font-weight: 700;
+  color: white;
+  background-color: #1d6154;
+  margin: 2em auto;
+  width: 180px;
+  text-align: center;
+  border-radius: 60px;
+  cursor: pointer;
 }
 
 input[type="button"] {
@@ -330,18 +339,11 @@ input[type="button"] {
   cursor: pointer;
 }
 
-input[type="submit"] {
-  font-family: 'Syne';
-  font-weight: 700;
-  color: white;
-  background-color: #1D6154;
-  margin: 2em auto;
-  width: 180px;
-  text-align: center;
-  border-radius: 60px;
-  cursor: pointer;
+footer {
+  background-color: white;
+  height: 50px;
+  width: 100%;
 }
-
 
 footer nav ul {
   display: flex;
@@ -349,23 +351,133 @@ footer nav ul {
   margin: 2em;
 }
 
-/* Log In Page */
-
-#login {
-  margin-left: auto;
-  margin-right: auto;
-  width: 40%;
+.login {
+  height: 100vh;
 }
 
-#login>h2,
-#login>a {
+.selectedMenu {
+  font-weight: bold;
+  cursor: not-allowed;
+}
+
+form input,
+form textarea {
+  padding: 0 20px;
+}
+
+#email {
+  color: #1d6154;
+  outline: none;
+}
+
+#email:focus {
+  border: 2px solid #1d6154;
+  border-radius: 5px;
+}
+
+.loginError {
+  margin-top: 20px;
+  text-align: center;
+  color: red;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+#password {
+  color: #1d6154;
+  outline: none;
+}
+
+#password:focus {
+  border: 2px solid #1d6154;
+  border-radius: 5px;
+}
+
+.forgotPassword {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+
+/* bandeau noir Editor*/
+
+.blackEditor {
+  position: fixed;
+  top: 0;
+  left: 0;
   display: flex;
+  align-items: center;
   justify-content: center;
+  background-color: black;
+  height: 80px;
+  width: 100%;
 }
 
-#login>a {
-  color: #3D3D3D;
+.marginTop {
+  margin-top: 100px;
 }
 
-.LoginNav {
-  font-weight: 600;
+.fa-regular {
+  color: white;
+  font-size: 16px;
+}
+
+.projectRemove {
+  color: white;
+  font-size: 16px;
+}
+
+.projectRemove>i {
+  padding-right: 10px;
+}
+
+.blackEditor button {
+  color: black;
+  font-size: 14px;
+  width: 216px;
+  height: 40px;
+  border-radius: 60px;
+  margin-left: 20px;
+  outline: none;
+  border: 2px solid black;
+  transition: 0.3s ease;
+}
+
+.blackEditor button:hover {
+  transform: scale(1.05);
+  color: white;
+  background: #1d6154;
+}
+
+/* Editor sous photo */
+
+.figureRemove {
+  display: flex;
+  flex-direction: row;
+  padding: 20px 10%;
+  color: black;
+}
+
+.figureRemove i {
+  padding-right: 20px;
+  color: black;
+}
+
+/* Editor Project */
+
+#titleProjectRemove {
+  font-family: "Work Sans";
+  font-weight: normal;
+  color: black;
+  font-size: 14px;
+  padding-left: 20px;
+}
+
+#titleProjectRemove:hover {
+  cursor: pointer;
+}
+
+#titleProjectRemove i {
+  padding-right: 10px;
+  color: black;
+}
