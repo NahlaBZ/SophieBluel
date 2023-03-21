@@ -204,48 +204,55 @@ const adminHTML = () => {
         .querySelector("body")
         .insertAdjacentElement("afterbegin", blackEditor);
 
+    // Création du SPAN 
     const spanblackEditor = document.createElement("span");
     spanblackEditor.classList.add("projectEdition");
-    spanblackEditor.textContent = "Modifier";
-
-    //Créer Le SPAN avec le "i"
+    spanblackEditor.textContent = "Mode édition";
+    //création de l'élement i : Icone Pen to Square : 
     const iconblackEditor = document.createElement("i");
     iconblackEditor.className = "fa-regular fa-pen-to-square";
 
-    //Insérer l'élément i avant le texte de span
+    //Insertion de l'élément i avant le texte de span
     spanblackEditor.insertBefore(iconblackEditor, spanblackEditor.firstChild);
-
+    //Création du bouton ''publier les changement 
     const btnblackEditor = document.createElement("button");
     btnblackEditor.textContent = "publier les changements";
-
+    //Ajout du span et le bouton au bandeau noir 
     blackEditor.appendChild(spanblackEditor);
     blackEditor.appendChild(btnblackEditor);
 
-    //Pointage des position à injecter
-    const figure = document.querySelector("#introduction figure");
-    const titleProject = document.querySelector("#portfolio > h2");
 
-    //SPAN "Mode édition" en dessou de Sophie
-    const spanFigure = spanblackEditor.cloneNode(true);
-    spanFigure.classList.remove("projectEdition");
+
+    //Pointage des position à injecter pour les deux spans '' modifier ''
+    const figurePosition = document.querySelector("#introduction figure");
+    const ProjecttitlePosition = document.querySelector("#portfolio > h2");
+
+
+    //SPAN "modifier" en dessou de la photo de Sophie
+    const spanFigure = document.createElement("span");
     spanFigure.classList.add("figureEdition");
-    //SPAN "Mode édition" des Projets
-    const spanTitleProject = spanblackEditor.cloneNode(true);
-    spanTitleProject.classList.remove("projectEdition");
+    spanFigure.textContent = "Modifier";
+    //Insertion de l'élément i  l'icone Pen to square avant le texte de span "modifier"
+    const iconfigureEdition = document.createElement("i");
+    iconfigureEdition.className = "fa-regular fa-pen-to-square";
+    //Insertion de l'élément i avant le texte de span 
+    spanFigure.insertBefore(iconfigureEdition, spanFigure.firstChild);
+
+    //SPAN "modifier" des Projets
+    const spanTitleProject = spanFigure.cloneNode(true);
+    spanTitleProject.classList.remove("figureEdition");
     spanTitleProject.setAttribute("id", "titleProjectEdition");
 
-    //INJECTION  SPAN
-    figure.appendChild(spanFigure);
-    titleProject.appendChild(spanTitleProject);
+    //INJECTION  des deux SPAN dans les deux positions déja mentionées
+    figurePosition.appendChild(spanFigure);
+    ProjecttitlePosition.appendChild(spanTitleProject);
 
-    //Login -> Logout HTML
-
+    //Changement du Login -> Logout HTML lors de la connexion 
     // Sélectionner l'élément <li> à modifier
     const logout = document.querySelector(
         "body > header > nav > ul > li:nth-child(3)"
     );
-
-    // Créer un élément <a> pour le lien de déconnexion
+    // Création d'un élément <a> pour le lien de déconnexion
     const logoutLink = document.createElement("a");
     logoutLink.href = "./index.html";
 
@@ -255,19 +262,59 @@ const adminHTML = () => {
     logout.innerHTML = "";
     logout.appendChild(logoutLink);
 
-    //  DECONEXion
+    //  Lorsqu'on va se Ddéconnecter 
     logoutLink.addEventListener("click", (event) => {
         event.preventDefault();
         removeToken();
         window.location.assign("./index.html");
     });
 
-    //Ajout class pour mieux intégrer le Blackeditor *fixed
+    //Ajout class pour mieux intégrer le Blackeditor
     document.body.classList.add("marginTop");
 
-    //Delete les filtres de Recherche HTML
+    //Delete les filtres de Recherche HTML lors de la connexion 
     filterButtons.remove();
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -326,6 +373,23 @@ function openModal() {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Ouverture de la page d'ajout des photos à partir de la modale
 function AddpicModal() {
     const addProject = document.getElementById("AddpicModal");
@@ -379,7 +443,7 @@ function AddpicModal() {
         const titleError = document.querySelector("#ErrorTitleSubmit");
         const categoryError = document.querySelector("#ErrorCategorySubmit");
         const submitForm = document.querySelector(
-            "#Works > div.footerModal.editFooter > input[type=submit]"
+            "#editWorks > div.footerModal.editFooter > input[type=submit]"
         );
         iCanSubmit = false;
         titleSelected = false;
