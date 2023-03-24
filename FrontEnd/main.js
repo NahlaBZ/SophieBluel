@@ -167,6 +167,7 @@ function checkToken() {
 function removeToken() {
     // Supprime le token du localStorage
     localStorage.removeItem("token");
+    sessionStorage.removeItem("deletedImages");
 
 
 }
@@ -190,7 +191,12 @@ function adminmode() {
         openModal();
         AddpicModal();
     });
-
+    const deleteWorksApi = document.querySelector("body > div > button");
+    //Confirmation DELETE CARTES dans L'API
+    deleteWorksApi.addEventListener("click", (e) => {
+        e.preventDefault();
+        functionDeleteWorksApi();
+    });
 
 }
 
@@ -321,7 +327,7 @@ const adminHTML = () => {
 
 
 function openModal() {
-
+    let deletedImages = {};
     document.getElementById("modalworks").innerHTML = "";
 
     //INJECTION DES ELEMENTS FETCHER
@@ -365,6 +371,53 @@ function openModal() {
             container.appendChild(iconMove);
         }
 
+        //DELETE icone Corbeille
+        iconDelete.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const cardDelete = e.target.parentNode.getAttribute("data-card-id");
+            removeElement(cardDelete);
+            deletedImages[cardDelete] = true;
+            console.log(deletedImages);
+
+            // Convertir l'objet en chaîne de caractères JSON
+            const deletedImagesJSON = JSON.stringify(deletedImages);
+            // Stocker JSON dans sessionStorage
+            sessionStorage.setItem("deletedImages", deletedImagesJSON);
+        });
+
+        //FONCTION DELETE SUR LE DOM UNIQUEMENT appellé ds l evenement au click delete:
+        function removeElement(cardDelete) {
+            const card = document.querySelector(`[data-card-id="${cardDelete}"]`);
+            if (card && card.parentNode) {
+                card.parentNode.removeChild(card);
+                container.remove(card);
+            }
+        }
+
+        //FONCTION DELETE ALL DU DOM DEPUIS MODAL
+        const deleteALL = document.querySelector("#deleteAllWorks");
+        deleteALL.addEventListener("click", () => {
+            const figureModals = document.querySelectorAll("#modalworks figure");
+            const galleryModals = document.querySelectorAll("#portfolio figure");
+            const deletedImages =
+                JSON.parse(sessionStorage.getItem("deletedImages")) || {};
+            const imageIds = [];
+
+            figureModals.forEach((figure) => {
+                const dataCardId = figure.getAttribute("data-card-id");
+                imageIds.push(dataCardId);
+                // stocke l'ID deletedImages
+                deletedImages[dataCardId] = true;
+            });
+
+            // DELETE TOUTES LES CARTES
+            figureModals.forEach((figure) => figure.remove());
+            galleryModals.forEach((figure) => figure.remove());
+
+            // Stocke les ID SESSIONTORAGE
+            sessionStorage.setItem("deletedImages", JSON.stringify(deletedImages));
+        });
+
         return container;
     });
 
@@ -372,36 +425,48 @@ function openModal() {
     galleryMap.append(...imageElements);
 }
 
+const functionDeleteWorksApi = () => {
+    // Récupérer la chaîne de sessionStorage
+    const deletedImagesJSON = sessionStorage.getItem("deletedImages");
+    // Convertir la chaîne en objet JavaScript
+    const deletedImages = JSON.parse(deletedImagesJSON);
+    // Supprimer chaque image du SESSION STORAGE
+    //méthode JavaScript qui renvoie un tableau contenant les clés d'un objet
+    Object.keys(deletedImages).forEach(async (id) => {
+        try {
+            if (token === false) return console.log({ error: "Pas connecté" });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            const response = await fetch(`${backEndApiURL}works/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Accept: "*/*",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (response.ok) {
+                console.log(`Image avec ID ${id} supprimée`);
+            } else {
+                throw new Error(response.statusText);
+            }
+        } catch (e) {
+            console.error(
+                `Erreur lors de la suppression de l'image avec ID ${id}: ${e}`
+            );
+        }
+    });
+};
 // Ouverture de la page d'ajout des photos à partir de la modale
 function AddpicModal() {
     const addProject = document.getElementById("AddpicModal");
     const inputFile = document.getElementById("filetoUpload");
     const selectCategory = document.getElementById("category");
     const editSection = document.querySelector("#editSection");
-    const addToApi = document.getElementById("addWorks");
+    const addToApi = document.getElementById("editWorks");
     const gallerySection = document.querySelector("#modalContent");
     const previewModal = document.querySelector("#previewModal");
     let iCanSubmit = false;
 
-    //Cache - Cache differentes section Madale
+    //*************************************Cache - Cache differentes section Madale
     addProject.addEventListener("click", () => {
         gallerySection.style.display = "none";
         editSection.style.display = "";
@@ -414,10 +479,10 @@ function AddpicModal() {
         previewModal.style.display = "none";
     });
 
-    //PARTIE IMG
+    //*************************************PARTIE IMG
     inputFile.addEventListener("change", addPicture);
 
-    //PARTIE CATEGORIE
+    //*************************************PARTIE CATEGORIE
 
     // Utiliser les données de l'API du 2e Fetch pour générer les options de l'élément select
 
@@ -452,7 +517,7 @@ function AddpicModal() {
         let category = document.querySelector("#category").value;
         const title = editTitle.value;
         const image = inputFile.files[0];
-
+        // console.log(typeof image);
 
         if (image === null || image === undefined) {
             errorImg.textContent = "Veuillez selectionnez une image";
@@ -465,14 +530,14 @@ function AddpicModal() {
             titleError.textContent = "";
             categorySelected = false;
         } else {
-
+            //submitForm.style.background = " #1d6154";
             titleError.textContent = "";
             categoryError.textContent = "";
             categorySelected = true;
             titleSelected = true;
             imageSelected = true;
 
-
+            //iCanSubmit = true;
         }
         if (titleSelected && categorySelected && imageSelected) {
             submitForm.style.background = " #1d6154";
@@ -482,7 +547,7 @@ function AddpicModal() {
 
     addToApi.addEventListener("submit", (e) => {
         e.preventDefault();
-        //Récupérer les valeurs INPUTs
+        //*************************************Récupérer les valeurs INPUTs
         if (iCanSubmit) {
             //Récupérer image
             const image = inputFile.files[0];
@@ -512,12 +577,12 @@ function AddpicModal() {
             })
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error("Requête NON passée");
+                        throw new Error("Requête POST non passée");
                     }
                     return response.json();
                 })
                 .then((data) => {
-                    console.log("Requête passée", data);
+                    console.log("Requête POST passée", data);
                     fetchWorks();
                     displayWorks();
                     closeModal();
@@ -526,14 +591,13 @@ function AddpicModal() {
                 })
                 .catch((error) => {
                     console.error("Error:", error);
-                    console.log("Ta requête POST non passée");
+                    console.log("Requête POST non passée");
                 });
         } else {
             console.log("Formulaire invalide");
         }
     });
 }
-
 function disableScroll() {
     document.body.classList.add("modalOpen");
 }
@@ -625,6 +689,7 @@ const addPicture = () => {
 
     if (file.size > maxSize) {
         errorImg.textContent = "Votre image est trop volumineuse";
+        console.log("fichier > 4MO!");
         return;
     }
 
@@ -640,3 +705,4 @@ const addPicture = () => {
 
     reader.readAsDataURL(file);
 };
+
