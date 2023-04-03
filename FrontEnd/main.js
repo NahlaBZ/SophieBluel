@@ -6,20 +6,35 @@ const filterButtons = document.querySelector(".filter");
 let filterNames;
 let categories = [];
 
+// Actions à faire au chargement de la page
+window.addEventListener("load", () => {
+    // Chargement des travaux
+    fetchWorks();
+    // Récupération des catégories et leurs ids
+    fetchApiCategories();
+    // Vérification du Token de connexion
+    checkToken();
+});
+
+//événement fermeture onglet ou redirection vers un autre site
+window.addEventListener("unload", removeToken);
+
+
+// Récupération et affichage des projets
 async function fetchWorks() {
 
     try {
         //Appel de l'API pour obtenir les projets
         works = await fetch(backEndApiURL + "works")
             .then((response) => response.json());
-        console.log(works);
+        //console.log(works);
 
         //On récupère tous les noms de filtres de façon dynamique (toutes les catégories)
-        filterNames = getFilterNames(works);
+        filterNames = getFilterNames();
         //console.log(filterNames);
 
         //On ajoute les boutons filtres au HTML
-        displayFilterButtons(filterNames, works);
+        displayFilterButtons(filterNames);
 
         //Affichage des projets
         displayWorks();
@@ -30,16 +45,14 @@ async function fetchWorks() {
 
 }
 
-//Récupération dynamique de toutes les catégories
-function
-
-    getFilterNames(works) {
-    //On récupère l'ensemble des catégories
+// Récupération dynamique de toutes les catégories
+function getFilterNames() {
+    // On récupère l'ensemble des catégories dans un Set (pour éviter les doublons)
     return [...new Set(works.map((work) => work.category.name))];
 }
 
-
-function displayFilterButtons(filterNames, works) {
+//Affichage des boutons filtres
+function displayFilterButtons(filterNames) {
     // On crée d'abord le bouton "Tous" qui ne correspond pas à une vraie catégorie
     const allButton = document.createElement("button");
     //On lui attribue une classe css, ce bouton est celui qui est actif au démarrage de la page
@@ -62,14 +75,14 @@ function displayFilterButtons(filterNames, works) {
         }),
     ];
 
-    //Lorsqu'on clique sur un filtre
+    //On définit l'action à faire si on clique sur un bouton filtre
     buttons.forEach((btn) => {
         btn.addEventListener("click", (e) => {
             //On récupère le texte du filtre sélectionné
             selectedCategory = e.target.textContent;
             //console.log(categoryIdValue);
 
-            //Pour chaque bouton, on retire la classe active
+            //Pour chaque bouton, on enlève la classe active
             buttons.forEach((btn) => {
                 btn.classList.remove("active");
             });
@@ -78,11 +91,12 @@ function displayFilterButtons(filterNames, works) {
             e.target.classList.add("active");
 
             //On rafraîchit les projets
-            displayWorks(works);
+            displayWorks();
         });
     });
 }
 
+// Affichage des projets en fonction du filtre sélectionné
 function displayWorks() {
     //On récupère le bloc "gallery"
     const gallery = document.querySelector(".gallery");
@@ -99,16 +113,14 @@ function displayWorks() {
         }
     });
 
-    // Afficher les projets
+    // Affichage des projets
     workDisplay.forEach((work) => {
         gallery.appendChild(workTemplate(work));
     });
 }
 
 
-
-
-
+//Affichage du projet passé en paramètre
 function workTemplate(work) {
     //Création de l'élément figure
     const workElement = document.createElement("figure");
@@ -124,6 +136,7 @@ function workTemplate(work) {
     const imgTitleElement = document.createElement("figcaption");
     imgTitleElement.textContent = work.title;
 
+    // Ajout des éléments construits
     workElement.appendChild(imgElement);
     workElement.appendChild(imgTitleElement);
 
@@ -145,18 +158,13 @@ async function fetchApiCategories() {
     }
 }
 
-window.addEventListener("load", () => {
-    //On appelle la fonction fetchWorks au chargement de la page HTML
-    fetchWorks();
-    fetchApiCategories();
-    checkToken();
-});
-//Vérification de la présence du token pour savoir s'il l'administrateur est connecté
+//Vérification de la présence du token pour savoir si l'administrateur est connecté
 function checkToken() {
     // Vérifie si le token est dans le localStorage
     const token = localStorage.getItem("token");
     if (token) {
         //console.log("Token présent");
+        // Affichage en mode Admin
         adminmode();
     } else {
         //console.log("Token non présent ");
@@ -170,33 +178,34 @@ function removeToken() {
     sessionStorage.removeItem("deletedImages");
 
 }
-//événement fermeture onglet ou redirection vers un autre site
-window.addEventListener("unload", removeToken);
 
-// Affichage du mode admin
+// Affichage du mode admin (utilisateur connecté)
 function adminmode() {
     adminHTML();
 
     const modalJs = document.getElementById("titleProjectEdition");
 
+    // Quand on clique sur le bouton Modifier
     modalJs.addEventListener("click", (e) => {
         e.preventDefault();
         modalHTML();
         displayModal();
         openModal();
-        AddpicModal();
+        openAddPictureModal();
     });
+
     const deleteWorksApi = document.querySelector("body > div > button");
-    //Confirmation DELETE CARTES dans L'API
+
+    // Publication de la suppression de projets
     deleteWorksApi.addEventListener("click", (e) => {
         e.preventDefault();
-        functionDeleteWorksApi();
+        publishDeletedWorks();
     });
 
 }
 
 const adminHTML = () => {
-    //Créer le bandeau noir Admin Editor
+    //Création du bandeau noir Admin Editor
     const blackEditor = document.createElement("div");
     blackEditor.classList.add("blackEditor");
     document
@@ -213,41 +222,43 @@ const adminHTML = () => {
 
     //Insertion de l'élément i avant le texte de span
     spanblackEditor.insertBefore(iconblackEditor, spanblackEditor.firstChild);
-    //Création du bouton ''publier les changement 
+    //Création du bouton 'publier les changement'
     const btnblackEditor = document.createElement("button");
     btnblackEditor.textContent = "publier les changements";
     //Ajout du span et le bouton au bandeau noir 
     blackEditor.appendChild(spanblackEditor);
     blackEditor.appendChild(btnblackEditor);
 
-    //Pointage des position à injecter pour les deux spans '' modifier ''
-    const figurePosition = document.querySelector("#introduction figure");
-    const ProjecttitlePosition = document.querySelector("#portfolio > h2");
 
-    //SPAN "modifier" en dessou de la photo de Sophie
+    //Ajout des boutons "Modifier"
+    const figurePosition = document.querySelector("#introduction figure");
+    const projectTitlePosition = document.querySelector("#portfolio > h2");
+
+    //SPAN "Modifier" en dessous de la photo de Sophie
     const spanFigure = document.createElement("span");
     spanFigure.classList.add("figureEdition");
     spanFigure.textContent = "Modifier";
-    //Insertion de l'élément i  l'icone Pen to square avant le texte de span "modifier"
+    // Ajout de l'icone avant "Modifier"
     const iconfigureEdition = document.createElement("i");
     iconfigureEdition.className = "fa-regular fa-pen-to-square";
     //Insertion de l'élément i avant le texte de span 
     spanFigure.insertBefore(iconfigureEdition, spanFigure.firstChild);
 
-    //SPAN "modifier" des Projets
+    // Ajout du bouton "Modifier" à côté de Mes Projets
     const spanTitleProject = spanFigure.cloneNode(true);
     spanTitleProject.classList.remove("figureEdition");
     spanTitleProject.setAttribute("id", "titleProjectEdition");
 
-    //INJECTION  des deux SPAN dans les deux positions déja mentionées
+    //Insertion des deux éléments créés
     figurePosition.appendChild(spanFigure);
-    ProjecttitlePosition.appendChild(spanTitleProject);
+    projectTitlePosition.appendChild(spanTitleProject);
 
-    //Changement du Login -> Logout HTML lors de la connexion 
-    // Sélectionner l'élément <li> à modifier
+    // Remplacement du bouton "login" par "logout ""
+    // Sélection de l'élément <li> à modifier
     const logout = document.querySelector(
         "body > header > nav > ul > li:nth-child(3)"
     );
+
     // Création d'un élément <a> pour le lien de déconnexion
     const logoutLink = document.createElement("a");
     logoutLink.href = "./index.html";
@@ -258,36 +269,36 @@ const adminHTML = () => {
     logout.innerHTML = "";
     logout.appendChild(logoutLink);
 
-    //  Lorsqu'on va se Ddéconnecter 
+    // Action à faire lorsque l'utilisateur clique sur "logout"
     logoutLink.addEventListener("click", (event) => {
         event.preventDefault();
+        //Suppression du token
         removeToken();
+        //Redirection vers la page index
         window.location.assign("./index.html");
     });
 
     //Ajout class pour mieux intégrer le Blackeditor
     document.body.classList.add("marginTop");
 
-    //Delete les filtres de Recherche HTML lors de la connexion 
+    //Masquage des boutons de filtres lorsque l'utilisateur est connecté
     filterButtons.remove();
 };
 
-
-
-
+// Affichage de la Modal d'édition
 function openModal() {
     let deletedImages = {};
+    // Récupération de l'emplacement à modifier
     document.getElementById("modalworks").innerHTML = "";
 
-    //INJECTION DES ELEMENTS FETCHER
-
+    // Récupération des images
     const imagesUrl = [...document.querySelectorAll(".gallery img")].map((img) =>
         img.getAttribute("src")
     );
 
     const imagesUrlSet = new Set(imagesUrl);
 
-    //INJECTIONS DES CARTES DS MODAL
+    //Ajout des images
     const modal = document.createElement("div");
     modal.classList.add("modal");
 
@@ -297,8 +308,7 @@ function openModal() {
         const p = document.createElement("p");
         const iconDelete = document.createElement("i");
 
-        // ajouter l'attribut data-card-id
-
+        // Ajout de l'attribut data-card-id
         container.setAttribute("data-card-id", works[index].id);
         iconDelete.id = "deleteIcon";
         iconDelete.classList.add("fa-solid", "fa-trash-can", "iconModal");
@@ -309,7 +319,7 @@ function openModal() {
         container.appendChild(p);
         container.appendChild(iconDelete);
 
-        // Ajouter l'icône de déplacement uniquement sur le premier élément
+        // Ajout de l'icône de déplacement uniquement sur le premier élément
         if (index === 0) {
             const iconMove = document.createElement("i");
             iconMove.id = "moveIcon";
@@ -320,21 +330,22 @@ function openModal() {
             );
             container.appendChild(iconMove);
         }
-        //DELETE icone Corbeille
+        // Action à faire lorsque l'utilisateur clique sur le bouton Supprimer
         iconDelete.addEventListener("click", async (e) => {
             e.preventDefault();
             const cardDelete = e.target.parentNode.getAttribute("data-card-id");
+            //Masquage de l'image à supprimer
             removeElement(cardDelete);
             deletedImages[cardDelete] = true;
             console.log(deletedImages);
 
-            // Convertir l'objet en chaîne de caractères JSON
+            // Conversion de l'objet en chaîne de caractères JSON
             const deletedImagesJSON = JSON.stringify(deletedImages);
-            // Stocker JSON dans sessionStorage
+            // Stockage des images supprimées dans sessionStorage
             sessionStorage.setItem("deletedImages", deletedImagesJSON);
         });
 
-        //FONCTION DELETE SUR LE DOM UNIQUEMENT appellé ds l evenement au click delete:
+        //Masquage de l'image à supprimer
         function removeElement(cardDelete) {
             const card = document.querySelector(`[data-card-id="${cardDelete}"]`);
             if (card && card.parentNode) {
@@ -343,8 +354,10 @@ function openModal() {
             }
         }
 
-        //FONCTION DELETE ALL DU DOM DEPUIS MODAL
+        //Bouton "Supprimer la galerie"
         const deleteALL = document.querySelector("#deleteAllWorks");
+
+        // Action à faire lorsque l'utilisateur clique sur "Supprimer la galerie"
         deleteALL.addEventListener("click", () => {
             const figureModals = document.querySelectorAll("#modalworks figure");
             const galleryModals = document.querySelectorAll("#portfolio figure");
@@ -359,11 +372,11 @@ function openModal() {
                 deletedImages[dataCardId] = true;
             });
 
-            // DELETE TOUTES LES CARTES
+            // Masquage de toutes les images
             figureModals.forEach((figure) => figure.remove());
             galleryModals.forEach((figure) => figure.remove());
 
-            // Stocke les ID SESSIONTORAGE
+            // Stockage des images à supprimer
             sessionStorage.setItem("deletedImages", JSON.stringify(deletedImages));
         });
 
@@ -374,12 +387,14 @@ function openModal() {
     galleryMap.append(...imageElements);
 }
 
-const functionDeleteWorksApi = () => {
-    // Récupérer la chaîne de sessionStorage
+//Publication des suppressions
+const publishDeletedWorks = () => {
+    // Récupérer les images à supprimer dpuis le sessionStorage
     const deletedImagesJSON = sessionStorage.getItem("deletedImages");
-    // Convertir la chaîne en objet JavaScript
+    // Convertir la chaîne JSON en objet JavaScript
     const deletedImages = JSON.parse(deletedImagesJSON);
-    // Supprimer chaque image du SESSION STORAGE
+
+    // Suppression des projets à supprimer
     //méthode JavaScript qui renvoie un tableau contenant les clés d'un objet
     Object.keys(deletedImages).forEach(async (id) => {
         try {
@@ -408,17 +423,17 @@ const functionDeleteWorksApi = () => {
 
 
 // Ouverture de la page d'ajout des photos à partir de la modale
-function AddpicModal() {
-    const addProject = document.getElementById("AddpicModal");
+function openAddPictureModal() {
+    const addProject = document.getElementById("addPictureModal");
     const inputFile = document.getElementById("filetoUpload");
     const selectCategory = document.getElementById("category");
     const editSection = document.querySelector("#editSection");
-    const addToApi = document.getElementById("editWorks");
+    const addPictureToDB = document.getElementById("editWorks");
     const gallerySection = document.querySelector("#modalContent");
     const previewModal = document.querySelector("#previewModal");
     let iCanSubmit = false;
 
-    //*************************************Cache - Cache differentes section Madale
+    //
     addProject.addEventListener("click", () => {
         gallerySection.style.display = "none";
         editSection.style.display = "";
@@ -431,13 +446,10 @@ function AddpicModal() {
         previewModal.style.display = "none";
     });
 
-    //*************************************PARTIE IMG
+    // Image
     inputFile.addEventListener("change", addPicture);
 
-    //*************************************PARTIE CATEGORIE
-
-    // Utiliser les données de l'API du 2e Fetch pour générer les options de l'élément select
-
+    // Catégorie
     if (selectCategory.options.length === 0) {
         const emptyOption = document.createElement("option");
         emptyOption.value = "";
@@ -451,7 +463,6 @@ function AddpicModal() {
             selectCategory.appendChild(option);
         });
     }
-    // Condition Formulaire POST
 
 
     editSection.addEventListener("input", () => {
@@ -497,9 +508,9 @@ function AddpicModal() {
         }
     });
 
-    addToApi.addEventListener("submit", (e) => {
+    addPictureToDB.addEventListener("submit", (e) => {
         e.preventDefault();
-        //*************************************Récupérer les valeurs INPUTs
+
         if (iCanSubmit) {
             //Récupérer image
             const image = inputFile.files[0];
@@ -538,7 +549,7 @@ function AddpicModal() {
                     fetchWorks();
                     displayWorks();
                     closeModal();
-                    // réinitialiser le champ inputFile sinon il envoie plusieur formData en post
+                    // réinitialisation du champ inputFile sinon il envoie plusieur formData en post
                     inputFile.value = "";
                 })
                 .catch((error) => {
@@ -591,8 +602,8 @@ const modalHTML = () => {
         </div>
         <div class="footerModal">
           <hr>
-          <input type="submit" value="Ajouter une photo" id="AddpicModal">
-          <p id="deleteAllWorks">Supprimer la gallerie</p>
+          <input type="submit" value="Ajouter une photo" id="addPictureModal">
+          <p id="deleteAllWorks">Supprimer la galerie</p>
         </div>
       </section>
       <!-- EDIT PHOTO -->
@@ -636,10 +647,10 @@ const addPicture = () => {
     const inputFile = document.getElementById("filetoUpload");
     const viewImage = document.getElementById("addImageContainer");
     const file = inputFile.files[0];
-    // 4Mo en octets => Message ERROR
-    const maxSize = 4 * 1024 * 1024;
+    // Taille maximale = 4MO
+    const maxFileSize = 4 * 1024 * 1024;
 
-    if (file.size > maxSize) {
+    if (file.size > maxFileSize) {
         errorImg.textContent = "Votre image est trop volumineuse";
         console.log("fichier > 4MO!");
         return;
@@ -657,4 +668,3 @@ const addPicture = () => {
 
     reader.readAsDataURL(file);
 };
-
