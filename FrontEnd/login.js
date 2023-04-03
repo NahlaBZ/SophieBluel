@@ -19,7 +19,6 @@ form.addEventListener("submit", (e) => {
 
 // Action suite à la saisie de l'email
 inputEmail.addEventListener("input", (e) => {
-    //inputEmail.reportValidity();
     inputPassword.style.color = "#1d6154";
     inputEmail.style.color = "#1d6154";
     logUser.email = e.target.value;
@@ -27,7 +26,6 @@ inputEmail.addEventListener("input", (e) => {
 
 // Action suite à la saisie du mot de passe
 inputPassword.addEventListener("input", (e) => {
-    //inputPassword.reportValidity();
     inputPassword.style.color = "#1d6154";
     inputEmail.style.color = "#1d6154";
     logUser.password = e.target.value;
@@ -52,7 +50,7 @@ async function loginUser() {
             body: JSON.stringify(logUser),
         }).then((response) => response.json());
 
-        //console.log(data);
+        console.log(data);
 
         if (data.message || data.error) {
             loginError.textContent = "Erreur dans l’identifiant ou le mot de passe";

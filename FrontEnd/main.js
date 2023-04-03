@@ -31,10 +31,13 @@ async function fetchWorks() {
 }
 
 //Récupération dynamique de toutes les catégories
-function getFilterNames(works) {
+function
+
+    getFilterNames(works) {
     //On récupère l'ensemble des catégories
     return [...new Set(works.map((work) => work.category.name))];
 }
+
 
 function displayFilterButtons(filterNames, works) {
     // On crée d'abord le bouton "Tous" qui ne correspond pas à une vraie catégorie
@@ -102,6 +105,10 @@ function displayWorks() {
     });
 }
 
+
+
+
+
 function workTemplate(work) {
     //Création de l'élément figure
     const workElement = document.createElement("figure");
@@ -144,13 +151,6 @@ window.addEventListener("load", () => {
     fetchApiCategories();
     checkToken();
 });
-
-
-
-
-
-
-
 //Vérification de la présence du token pour savoir s'il l'administrateur est connecté
 function checkToken() {
     // Vérifie si le token est dans le localStorage
@@ -169,14 +169,9 @@ function removeToken() {
     localStorage.removeItem("token");
     sessionStorage.removeItem("deletedImages");
 
-
 }
-
 //événement fermeture onglet ou redirection vers un autre site
 window.addEventListener("unload", removeToken);
-
-
-
 
 // Affichage du mode admin
 function adminmode() {
@@ -201,8 +196,6 @@ function adminmode() {
 }
 
 const adminHTML = () => {
-
-
     //Créer le bandeau noir Admin Editor
     const blackEditor = document.createElement("div");
     blackEditor.classList.add("blackEditor");
@@ -227,12 +220,9 @@ const adminHTML = () => {
     blackEditor.appendChild(spanblackEditor);
     blackEditor.appendChild(btnblackEditor);
 
-
-
     //Pointage des position à injecter pour les deux spans '' modifier ''
     const figurePosition = document.querySelector("#introduction figure");
     const ProjecttitlePosition = document.querySelector("#portfolio > h2");
-
 
     //SPAN "modifier" en dessou de la photo de Sophie
     const spanFigure = document.createElement("span");
@@ -285,47 +275,6 @@ const adminHTML = () => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function openModal() {
     let deletedImages = {};
     document.getElementById("modalworks").innerHTML = "";
@@ -335,6 +284,7 @@ function openModal() {
     const imagesUrl = [...document.querySelectorAll(".gallery img")].map((img) =>
         img.getAttribute("src")
     );
+
     const imagesUrlSet = new Set(imagesUrl);
 
     //INJECTIONS DES CARTES DS MODAL
@@ -370,7 +320,6 @@ function openModal() {
             );
             container.appendChild(iconMove);
         }
-
         //DELETE icone Corbeille
         iconDelete.addEventListener("click", async (e) => {
             e.preventDefault();
@@ -455,6 +404,9 @@ const functionDeleteWorksApi = () => {
         }
     });
 };
+
+
+
 // Ouverture de la page d'ajout des photos à partir de la modale
 function AddpicModal() {
     const addProject = document.getElementById("AddpicModal");
